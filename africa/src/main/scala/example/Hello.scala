@@ -3,30 +3,41 @@ package example
 import scala.io.Source
 import java.io.FileOutputStream
 import java.io.PrintStream
-import io.circe.parser._
-//import cats.syntax.either._
+import io.circe.parser._, io.circe.generic.auto._ //, io.circe._, io.circe.Decoder, cats.syntax.either._
+import io.circe.{Encoder, Json}
 
 
 
 object Hello extends Greeting with App {
-  println( greeting )
+  print( greeting )
 
   def source = Source.fromURL(
     "https://raw.githubusercontent.com/mledoze/countries/master/countries.json"
   )
 
   case class CountryName( official: String)
-  case class Country( name: CountryName, region: String, area:Int)
+  case class Country( name: CountryName, capital: List[String], region: String, area: Float)
+  case class CountryOut( name: String, capital: String, area: Float)
 
   val str = source.mkString
+  println( s" Data size: ${str.size}" )
 
-  val data = decode[ List[Country]]( str ) match {
-       case Left(failure) => println(failure)
-       case Right(countries) => countries.filter( _.region == "Africa").sortBy(- _.area).take( 10 )
+  var dataIn : List[Country] = Nil
+
+  val result = decode[ List[Country]]( str ) match {
+       case Left( failure )    => println( "fail: "+ failure )
+       case Right( countries ) => dataIn = countries.filter( _.region == "Africa").sortBy(- _.area).take( 10 )
      }
+  println( dataIn )
+
+  val dataOut: List[CountryOut] = for( cou <- dataIn ) yield CountryOut( cou.name.official, cou.capital.head, cou.area)
+  println( dataOut )
+
+  val out = io.circe.Encoder[ List[CountryOut] ].apply( dataOut ).toString()
+  println( out )
 
 }
 
 trait Greeting {
-  lazy val greeting: String = "hello"
+  lazy val greeting: String = "Hello!"
 }
