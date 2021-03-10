@@ -3,6 +3,7 @@
 
 # Сборка:
 cd africa
+
 sbt assembly
 
 # Запуск:
