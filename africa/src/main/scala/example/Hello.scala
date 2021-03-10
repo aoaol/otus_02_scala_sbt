@@ -25,16 +25,26 @@ object Hello extends Greeting with App {
   var dataIn : List[Country] = Nil
 
   val result = decode[ List[Country]]( str ) match {
-       case Left( failure )    => println( "fail: "+ failure )
+       case Left( failure )    => println( "Failed: "+ failure )
        case Right( countries ) => dataIn = countries.filter( _.region == "Africa").sortBy(- _.area).take( 10 )
      }
-  println( dataIn )
 
-  val dataOut: List[CountryOut] = for( cou <- dataIn ) yield CountryOut( cou.name.official, cou.capital.head, cou.area)
-  println( dataOut )
+  if (dataIn.nonEmpty) {
+    val dataOut: List[CountryOut] = for( cou <- dataIn ) yield CountryOut( cou.name.official, cou.capital.head, cou.area)
 
-  val out = io.circe.Encoder[ List[CountryOut] ].apply( dataOut ).toString()
-  println( out )
+    val out = io.circe.Encoder[ List[CountryOut] ].apply( dataOut ).toString()
+    println("10 largest african countries:")
+    println( out )
+
+    val outputFile = args( 0 )
+    val fos = new FileOutputStream( outputFile )
+    val printer = new PrintStream( fos )
+
+    printer.println( out )
+    println("")
+    println( s"Writen to file: $outputFile")
+  }
+
 
 }
 
