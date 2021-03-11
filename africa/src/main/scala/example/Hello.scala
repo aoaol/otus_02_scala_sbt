@@ -39,8 +39,9 @@ object Hello extends Greeting with App {
     val outputFile = args( 0 )
     val fos = new FileOutputStream( outputFile )
     val printer = new PrintStream( fos )
-
     printer.println( out )
+    printer.close()
+
     println("")
     println( s"Writen to file: $outputFile")
   }
