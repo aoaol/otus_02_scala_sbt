@@ -40,6 +40,7 @@ object Hello extends Greeting with App {
     val fos = new FileOutputStream( outputFile )
     val printer = new PrintStream( fos )
     printer.println( out )
+    source.close()
     printer.close()
 
     println("")
